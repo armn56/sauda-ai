@@ -4,16 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Sauda AI — ИИ-продавец для магазинов</title>
-<meta name="description" content="ИИ-продавец в WhatsApp и Telegram: отвечает клиентам ночью, принимает оплату Kaspi и передаёт заказ в работу. 2 недели бесплатно.">
+<meta name="description" content="Отвечает каждому клиенту в WhatsApp и Telegram и доводит до оплаты Kaspi. 2 недели бесплатно.">
 <meta property="og:title" content="Sauda AI — ИИ-продавец для магазинов">
-<meta property="og:description" content="ИИ-продавец в WhatsApp и Telegram: отвечает клиентам ночью, принимает оплату Kaspi и передаёт заказ в работу. 2 недели бесплатно.">
+<meta property="og:description" content="Отвечает каждому клиенту в WhatsApp и Telegram и доводит до оплаты Kaspi. 2 недели бесплатно.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://armn56.github.io/sauda-ai/">
 <meta name="theme-color" content="#0f1c17">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%230f1c17'/%3E%3Ctext x='32' y='43' font-family='Arial' font-weight='700' font-size='32' text-anchor='middle' fill='%23f0b76a'%3ES%3C/text%3E%3C/svg%3E">
 <style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 </head>
-<body><link rel="preconnect" href="https://fonts.googleapis.com">
+<body>
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600&family=Golos+Text:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -96,9 +97,9 @@ nav a:hover { color: var(--night-text); }
 header .btn { padding: 12px 18px; font-size: 15px; }
 
 .hero { padding-block: 56px 48px; }
-.hero h1 { font: 500 clamp(26px, 5.6vw, 72px)/1.06 var(--display); letter-spacing: -.035em; overflow-wrap: anywhere; }
+.hero h1 { font: 500 clamp(26px, 5.2vw, 66px)/1.06 var(--display); letter-spacing: -.035em; overflow-wrap: anywhere; }
 .hero h1 .t { display: block; }
-.hero h1 time { color: var(--apricot); font-variant-numeric: tabular-nums; }
+.hero h1 .accent { color: var(--apricot); }
 .hero-foot { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 28px 48px; margin-top: 36px; }
 .lead { font-size: 19px; color: var(--night-soft); max-width: 32em; }
 .actions { display: flex; flex-wrap: wrap; gap: 12px; }
@@ -165,11 +166,9 @@ header, main, footer { position: relative; z-index: 1; }
 .sky-on body, .sky-on .night { background: transparent; }
 .sky-on main > .night::after { display: none; }
 
-/* табло: цифры часов прокручиваются */
-.roll { display: inline-flex; }
-.dg { display: inline-block; height: 1.06em; overflow: hidden; vertical-align: bottom; }
-.dg > span { display: flex; flex-direction: column; transition: transform 1.2s var(--ease); transition-delay: calc(var(--d, 0) * 70ms); }
-.dg > span > span { height: 1.06em; line-height: 1.06em; }
+/* заголовок: при загрузке вторая строка проявляется из-под маски, как будто её дописывают */
+.hero h1 .accent { clip-path: inset(0 0 0 0); animation: write 1.1s .35s var(--ease) both; }
+@keyframes write { from { clip-path: inset(0 100% 0 0); } }
 
 /* отклик на действия */
 .tabs { position: relative; }
@@ -291,7 +290,7 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
 @media (prefers-reduced-motion: reduce) {
   /* без движения: смена цвета и прозрачности остаётся, сдвигов и прокрутки нет */
   *, *::before, *::after { animation: none !important; }
-  .dg > span, .tabs .pill, .btn, .chip { transition: none !important; }
+  .tabs .pill, .btn, .chip { transition: none !important; }
   .btn:active, .chip:active, .tabs button:active { transform: none; }
   .fold { transition: opacity .2s; }
 }
@@ -315,7 +314,7 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
 <div class="night">
   <div class="hero">
     <div class="wrap">
-      <h1><span class="t">Клиент написал в <time id="t-first">23:41</time>.</span><span class="t">Заказ оплачен в <time id="t-paid">23:46</time>.</span></h1>
+      <h1><span class="t">Отвечает каждому клиенту.</span><span class="t accent" id="t-paid">Доводит до оплаты.</span></h1>
       <div class="hero-foot">
         <p class="lead">Sauda AI отвечает клиентам вашего магазина в WhatsApp и Telegram. Подбирает товар по вашему каталогу, считает доставку, принимает оплату Kaspi и передаёт заказ вам в работу.</p>
         <div class="actions">
@@ -510,24 +509,8 @@ footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; g
     `<li class="beat"><time class="at">${time}</time><span class="rail" aria-hidden="true"><span class="fill"></span></span>` +
     `<div class="say">${say}</div><p class="did"><b>${did[0]}</b>${did[1]}</p></li>`;
 
-  // табло: каждая цифра — лента 0–9, сдвигаем её на нужную цифру
-  function rollTo(el, text) {
-    if (!el.querySelector(".roll")) {
-      el.innerHTML = `<span class="sr"></span><span class="roll" aria-hidden="true">` +
-        [...text].map((c, i) => /\d/.test(c)
-          ? `<span class="dg" style="--d:${i}"><span>${[...Array(10).keys()].map(n => `<span>${n}</span>`).join("")}</span></span>`
-          : `<span>${c}</span>`).join("") + `</span>`;
-      void el.offsetWidth;  // старт с 00:00 — дальше прокрутка до нужного времени
-    }
-    el.querySelector(".sr").textContent = text;
-    const strips = el.querySelectorAll(".dg > span");
-    [...text.replace(/\D/g, "")].forEach((n, i) => strips[i].style.transform = `translateY(${-1.06 * n}em)`);
-  }
-
   function show(key) {
     const d = DEMOS[key];
-    rollTo(document.getElementById("t-first"), d.beats[0][0]);
-    rollTo(document.getElementById("t-paid"), d.beats[2][0]);
     reel.innerHTML = d.beats.map(([t, msgs], i) => beat(t, msgs.map(bubble).join(""), DID[i])).join("");
     am.innerHTML =
       beat("08:00", `<div class="n"><b>☀️ Доброе утро! За ночь с 22:00</b><br>Писали клиентов: 14, новых заказов: 4, оплачено 3<br>Сегодня собрать и отправить: 6</div>`,
